@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { NewsCategoriesModule, NewsModule, UsersModule } from './modules';
 import { configuration } from './config/config';
 import { AuthModule } from './modules/auth/auth.module';
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -21,8 +22,8 @@ import { AuthModule } from './modules/auth/auth.module';
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.db'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: configService.get<boolean>('isDevelopment'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         logging: configService.get<boolean>('isDevelopment'),
       }),
       inject: [ConfigService],
@@ -31,6 +32,7 @@ import { AuthModule } from './modules/auth/auth.module';
     NewsModule,
     NewsCategoriesModule,
     UsersModule,
+    FileUploadModule,
   ],
 })
 export class AppModule {}
