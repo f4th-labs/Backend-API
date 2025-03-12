@@ -15,27 +15,27 @@ import { UpdateNewsDto } from './dto/update-news.dto';
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
-  @Post()
+  @Post('post')
   async create(@Body() createNewsDto: CreateNewsDto) {
     return this.newsService.create(createNewsDto);
   }
 
-  @Get()
+  @Get('posts')
   async findAll() {
     return this.newsService.findAll();
   }
 
-  @Get(':id')
+  @Get('post/:id')
   async findOne(@Param('id') id: string) {
     return this.newsService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('post/:id')
   async update(@Param('id') id: string, @Body() updateNewsDto: UpdateNewsDto) {
     return this.newsService.update(id, updateNewsDto);
   }
 
-  @Delete(':id')
+  @Delete('post/:id')
   async remove(@Param('id') id: string) {
     return this.newsService.remove(id);
   }

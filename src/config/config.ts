@@ -54,6 +54,10 @@ class EnvironmentVariables {
   @IsNumber()
   MINIO_PORT: number;
 
+  @IsNotEmpty()
+  @IsString()
+  ALLOWED_ORIGIN: string;
+
   get isDevelopment(): boolean {
     return this.NODE_ENV === 'development';
   }

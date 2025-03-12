@@ -3,19 +3,28 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  try {
-    const app = await NestFactory.create(AppModule);
-    const configService = app.get(ConfigService);
-    app.use(cookieParser());
+  const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
-    console.log(configService.get<string>('MINIO_ACCESS_KEY'));
-    console.log(configService.get<string>('MINIO_SECRET_KEY'));
+  app.use(cookieParser());
 
-    await app.listen(configService.get<number>('PORT') || 3000);
-  } catch (error) {
-    console.error('Error during app initialization:', error);
-  }
+  app.enableCors({
+    origin: configService.get<string>('ALLOWED_ORIGIN'),
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
+
+  const config = new DocumentBuilder()
+    .setTitle('Backend-API')
+    .setVersion('1.0')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
+
+  await app.listen(configService.get<number>('PORT') || 3000);
 }
 bootstrap();
