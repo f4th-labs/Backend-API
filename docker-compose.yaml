@@ -2,27 +2,27 @@ services:
   db:
     image: postgres:14
     container_name: postgres
-    env_file:
-      - ./.env
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=p@ssword
+      - POSTGRES_DB=mydb
+      - POSTGRES_PORT=5432
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  # app:
-  #   build: .
-  #   container_name: backend-api
-  #   environment:
-  #     NODE_ENV: development
-  #     POSTGRES_HOST: db
-  #     POSTGRES_PORT: 5432
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: p@ssword
-  #     POSTGRES_DB: mydb
-  #   ports:
-  #     - '3000:3000'
-  #   depends_on:
-  #     - db
+  minio:
+    image: bitnami/minio:latest
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: supersecret
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - 'minio_data:/data'
 
 volumes:
   postgres_data:
+  minio_data:
+    driver: local
