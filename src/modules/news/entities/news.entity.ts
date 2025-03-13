@@ -23,15 +23,16 @@ export class News {
   @Column()
   content: string;
 
-  @ManyToOne(() => NewsCategory, (category) => category.name, {
-    nullable: true,
-  })
+  @Column({ nullable: true })
+  imageUrl: string;
+
+  @ManyToOne(() => NewsCategory, (category) => category.name)
   @JoinColumn()
   category: string;
 
-  @ManyToOne(() => User, (author) => author.news, { nullable: true })
+  @ManyToOne(() => User, (user) => user.news)
   @JoinColumn()
-  author: string;
+  author: User;
 
   @CreateDateColumn({
     type: 'timestamp',

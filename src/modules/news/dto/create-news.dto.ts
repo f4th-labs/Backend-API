@@ -1,8 +1,23 @@
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+
 export class CreateNewsDto {
+  @IsNotEmpty()
+  @IsString()
   title: string;
+
+  @IsNotEmpty()
+  @IsString()
   description: string;
+
+  @IsNotEmpty()
+  @IsString()
   content: string;
-  category: string;
-  author: string;
-  createdDate: Date;
+
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }

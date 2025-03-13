@@ -1,26 +1,46 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
+import { UsersService } from '@/modules/users/users.service';
+import { IJwtPayload } from '@/shares/interfaces';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(configService: ConfigService) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+  constructor(
+    configService: ConfigService,
+    private readonly userService: UsersService,
+  ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => {
-          return request?.cookies?.access_token;
-        },
-      ]),
+      jwtFromRequest: (req) => {
+        if (req && req.cookies) {
+          return req.cookies['access_token'];
+        }
+        return null;
+      },
+      ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET') || 'Secret',
+      passReqToCallback: true, 
     });
   }
 
-  validate(payload: any) {
-    return { userId: payload.sub, email: payload.email };
+  async validate(req: Request, payload: IJwtPayload) {
+    const user = await this.userService.findUserbyEmail(payload.email);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const userResponse = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    return userResponse;
   }
 }

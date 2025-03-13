@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NewsCategoriesModule, NewsModule, UsersModule } from './modules';
@@ -6,7 +6,6 @@ import { validate } from './config/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { MinioModule } from './modules/minio/minio.module';
 import { MinioController } from './modules/minio/minio.controller';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
