@@ -18,7 +18,7 @@ export class NewsCategoriesController {
   async create(@Body() newsCategory: NewsCategory) {
     return this.newsCategoriesService.create(newsCategory);
   }
-
+  
   @Get()
   async findAll() {
     return this.newsCategoriesService.findAll();

@@ -10,10 +10,10 @@ import {
   UseGuards,
   UseInterceptors,
   UnauthorizedException,
+  Query,
 } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
-import { UpdateNewsDto } from './dto/update-news.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from '../users/users.service';
@@ -24,6 +24,7 @@ import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { Auth } from '@/common/decorators/auth.decorator';
+import { ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 @Controller('news')
 export class NewsController {
@@ -43,6 +44,21 @@ export class NewsController {
   ) {
     const author = await this.usersService.findUserbyEmail(user.email);
     return this.newsService.create(createNewsDto, author, file);
+  }
+
+  @ApiQuery({
+    name: 'query',
+    required: false,
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns news articles matching the search query',
+  })
+  @Get('search')
+  async search(@Query('query') query: string, @Query('q') q: string) {
+    const searchTerm = query || q || '';
+    return this.newsService.search(searchTerm);
   }
 
   @Get('posts')

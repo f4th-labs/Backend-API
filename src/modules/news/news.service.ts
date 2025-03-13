@@ -37,6 +37,23 @@ export class NewsService {
     return this.newsRepository.save(news);
   }
 
+  async search(query: string): Promise<News[]> {
+    if (!query) {
+      return this.findAll();
+    }
+
+    return this.newsRepository
+      .createQueryBuilder('news')
+      .leftJoinAndSelect('news.author', 'author')
+      .leftJoinAndSelect('news.category', 'category')
+      .where('news.title ILIKE :query', { query: `%${query}%` })
+      .orWhere('news.description ILIKE :query', { query: `%${query}%` })
+      .orWhere('news.content ILIKE :query', { query: `%${query}%` })
+      .orderBy('news.createdDate', 'DESC')
+      .getMany();
+  }
+
+
   async findAll(): Promise<News[]> {
     return await this.newsRepository.find({
       relations: ['author', 'category'],

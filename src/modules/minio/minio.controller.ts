@@ -22,13 +22,13 @@ export class MinioController {
     return fileName;
   }
 
-  @Get('upload/:fileName')
+  @Get(':fileName')
   async getBookCover(@Param('fileName') fileName: string) {
     const fileUrl = await this.minioService.getFileUrl(fileName);
     return fileUrl;
   }
 
-  @Delete('upload/:fileName')
+  @Delete(':fileName')
   async deleteBookCover(@Param('fileName') fileName: string) {
     await this.minioService.deleteFile(fileName);
     return fileName;

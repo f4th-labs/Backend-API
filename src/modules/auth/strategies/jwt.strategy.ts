@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
@@ -17,14 +14,20 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   ) {
     super({
       jwtFromRequest: (req) => {
-        if (req && req.cookies) {
+        if (req && req.cookies && req.cookies['access_token']) {
           return req.cookies['access_token'];
         }
+
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          return authHeader.substring(7);
+        }
+
         return null;
       },
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET') || 'Secret',
-      passReqToCallback: true, 
+      passReqToCallback: true,
     });
   }
 
