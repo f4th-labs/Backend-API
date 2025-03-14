@@ -8,6 +8,7 @@ import { Logger } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const isDevelopment = configService.get<string>('NODE_ENV') === 'development';
 
   app.use(cookieParser());
 
@@ -21,12 +22,14 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  const config = new DocumentBuilder()
-    .setTitle('Backend-API')
-    .setVersion('1.0')
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  if (isDevelopment) {
+    const config = new DocumentBuilder()
+      .setTitle('Backend-API')
+      .setVersion('1.0')
+      .build();
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, documentFactory);
+  }
 
   await app.listen(configService.get<number>('PORT') || 3000);
 }
