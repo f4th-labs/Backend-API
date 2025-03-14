@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UploadedFile,
@@ -11,6 +10,7 @@ import {
   UseInterceptors,
   UnauthorizedException,
   Query,
+  Put,
 } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
@@ -25,6 +25,8 @@ import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { Auth } from '@/common/decorators/auth.decorator';
 import { ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@/common/guards';
+import { UpdateNewsDto } from './dto/update-news.dto';
 
 @Controller('news')
 export class NewsController {
@@ -71,18 +73,18 @@ export class NewsController {
     return this.newsService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put('post/:id')
   @Auth(UserRole.AUTHOR, UserRole.ADMIN)
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('image'))
   async update(
     @Param('id') id: string,
-    @Body() updateNewsDto: any,
+    @Body() updateNewsDto: UpdateNewsDto,
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: User,
   ) {
     const news = await this.newsService.findOne(id);
-    const isAdmin = user.role === 'admin';
+    const isAdmin = user.role === UserRole.ADMIN;
     const isAuthor = news.author && news.author.id === user.id;
 
     if (!isAdmin && !isAuthor) {
@@ -94,11 +96,11 @@ export class NewsController {
     if (file) {
       await this.minioService.createBucketIfNotExists();
       const fileName = await this.minioService.uploadFile(file);
-      const imageUrl = await this.minioService.getFileUrl(fileName);
-      updateNewsDto.imageUrl = imageUrl;
+      updateNewsDto.imageUrl = await this.minioService.getFileUrl(fileName);
     }
 
-    return this.newsService.update(id, updateNewsDto);
+    const result = await this.newsService.update(id, updateNewsDto);
+    return result;
   }
 
   @Delete('post/:id')

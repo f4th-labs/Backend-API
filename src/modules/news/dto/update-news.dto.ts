@@ -14,7 +14,7 @@ export class UpdateNewsDto {
   content?: string;
 
   @IsOptional()
-  category?: any;
+  categoryName?: any;
 
   @IsOptional()
   @IsString()

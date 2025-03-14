@@ -6,6 +6,7 @@ import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { MinioService } from '../minio/minio.service';
 import { User } from '../users/entities/user.entity';
+import { NewsCategoriesService } from '../news-categories/news-categories.service';
 
 @Injectable()
 export class NewsService {
@@ -13,6 +14,7 @@ export class NewsService {
     @InjectRepository(News)
     private readonly newsRepository: Repository<News>,
     private readonly minioService: MinioService,
+    private readonly newsCategoriesService: NewsCategoriesService,
   ) {}
 
   async create(
@@ -53,7 +55,6 @@ export class NewsService {
       .getMany();
   }
 
-
   async findAll(): Promise<News[]> {
     return await this.newsRepository.find({
       relations: ['author', 'category'],
@@ -66,25 +67,47 @@ export class NewsService {
       relations: ['author', 'category'],
     });
     if (!news) {
-      throw new NotFoundException(`News with id ${id} not found`);
+      throw new NotFoundException(`News not found`);
     }
     return news;
   }
 
   async update(id: string, updateNewsDto: UpdateNewsDto): Promise<News> {
-    const news = await this.newsRepository.findOne({ where: { id } });
+    const news = await this.newsRepository.findOne({
+      where: { id },
+      relations: ['author', 'category'],
+    });
+
     if (!news) {
-      throw new NotFoundException(`News not found`);
+      throw new NotFoundException(`New not found`);
     }
 
-    await this.newsRepository.update(id, updateNewsDto);
-    return this.newsRepository.save(news);
+    if (updateNewsDto.categoryName) {
+      const category = await this.newsCategoriesService.findOne(
+        updateNewsDto.categoryName,
+      );
+
+      news.category = category.id;
+
+      delete updateNewsDto.categoryName;
+    }
+
+    // Merge the new data with existing news
+    const updatedNews = {
+      ...news,
+      ...updateNewsDto,
+      author: news.author,
+    };
+
+    const result = await this.newsRepository.save(updatedNews);
+
+    return result;
   }
 
   async remove(id: string): Promise<void> {
     const news = await this.newsRepository.findOne({ where: { id } });
     if (!news) {
-      throw new NotFoundException(`News with id ${id} not found`);
+      throw new NotFoundException(`News not found`);
     }
     await this.newsRepository.delete(id);
   }
