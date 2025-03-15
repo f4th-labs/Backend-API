@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Minio from 'minio';
 import * as fileType from 'file-type';
@@ -7,6 +7,8 @@ import * as fileType from 'file-type';
 export class MinioService {
   private minioClient: Minio.Client;
   private bucketName: string;
+  private readonly logger = new Logger(MinioService.name);
+
 
   constructor(private readonly configService: ConfigService) {
     this.minioClient = new Minio.Client({
@@ -51,7 +53,7 @@ export class MinioService {
       if (url.startsWith('http:')) {
         return url.replace('http:', 'https:');
       }
-      
+      this.logger.log(`Generated URL: ${url}`);
       return url;
     } catch (error) {
       throw new BadRequestException(`Failed to generate file URL: ${error.message}`);
