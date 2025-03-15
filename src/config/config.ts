@@ -62,6 +62,10 @@ class EnvironmentVariables {
   @IsString()
   MINIO_USE_SSL: string;
 
+  @IsNotEmpty()
+  @IsString()
+  MINIO_PUBLIC_ENDPOINT: string;
+
   get isDevelopment(): boolean {
     return this.NODE_ENV === 'development';
   }

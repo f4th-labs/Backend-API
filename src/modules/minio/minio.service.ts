@@ -12,7 +12,10 @@ export class MinioService {
   private readonly configServicer: ConfigService;
 
   constructor(private readonly configService: ConfigService) {
-    this.logger.log('Initializing Minio service', configService.get('MINIO_ENDPOINT'));
+    this.logger.log(
+      'Initializing Minio service',
+      configService.get('MINIO_ENDPOINT'),
+    );
     this.minioClient = new Minio.Client({
       endPoint: configService.get<string>('MINIO_ENDPOINT') || 'localhost',
       port: configService.get<number>('MINIO_PORT'),
@@ -22,6 +25,7 @@ export class MinioService {
     });
     this.bucketName =
       configService.get<string>('MINIO_BUCKET_NAME') || 'default';
+    const publicEndpoint = configService.get<string>('MINIO_PUBLIC_ENDPOINT');
   }
 
   async createBucketIfNotExists() {
@@ -45,7 +49,7 @@ export class MinioService {
       );
       return fileName;
     } catch (error) {
-      throw new error(
+      throw new BadRequestException(
         `Failed to upload file to Minio: ${error.message}`,
       );
     }
@@ -59,12 +63,21 @@ export class MinioService {
         fileName,
         24 * 60 * 60,
       );
-      this.logger.log(`Generated URL: ${url}`);
+      const publicEndpoint = this.configService.get<string>(
+        'MINIO_PUBLIC_ENDPOINT',
+      );
 
-      if (url.startsWith('http:')) {
-        return url.replace('http:', 'https:');
+      if (publicEndpoint) {
+        const originalUrl = new URL(url);
+
+        const protocol = 'https';
+
+        const publicUrl = `${protocol}://${publicEndpoint}${originalUrl.pathname}${originalUrl.search}`;
+
+        console.log(`Transformed to public URL: ${publicUrl}`);
+        return publicUrl;
       }
-      this.logger.log(`Generated URL: ${url}`);
+
       return url;
     } catch (error) {
       throw new BadRequestException(
