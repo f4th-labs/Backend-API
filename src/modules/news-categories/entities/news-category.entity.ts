@@ -9,6 +9,9 @@ export class NewsCategory {
   @Column({ unique: true })
   name: string;
 
-  @OneToMany(() => News, (news) => news.category, { cascade: true, nullable: true })
+  @OneToMany(() => News, (news) => news.category, {
+    cascade: true,
+    nullable: true,
+  })
   news: News[];
 }

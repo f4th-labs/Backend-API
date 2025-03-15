@@ -1,23 +1,23 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Minio from 'minio';
-import * as fileType from 'file-type';
-import { log } from 'console';
+import { JwtAuthGuard } from '@/common/guards';
 
+@UseGuards(JwtAuthGuard)
 @Injectable()
 export class MinioService {
   private minioClient: Minio.Client;
   private bucketName: string;
-  private readonly logger = new Logger(MinioService.name);
-  private readonly configServicer: ConfigService;
 
   constructor(private readonly configService: ConfigService) {
-    this.logger.log(
-      'Initializing Minio service',
-      configService.get('MINIO_PUBLIC_ENDPOINT'),
-    );
     this.minioClient = new Minio.Client({
-      endPoint: configService.get<string>('MINIO_PUBLIC_ENDPOINT') || 'localhost',
+      endPoint:
+        configService.get<string>('MINIO_PUBLIC_ENDPOINT') || 'localhost',
       port: configService.get<number>('MINIO_PORT'),
       useSSL: configService.get<string>('MINIO_USE_SSL') === 'true',
       accessKey: configService.get<string>('MINIO_ACCESS_KEY'),
@@ -25,7 +25,6 @@ export class MinioService {
     });
     this.bucketName =
       configService.get<string>('MINIO_BUCKET_NAME') || 'default';
-    const publicEndpoint = configService.get<string>('MINIO_PUBLIC_ENDPOINT');
   }
 
   async createBucketIfNotExists() {
@@ -38,8 +37,6 @@ export class MinioService {
   async uploadFile(file: Express.Multer.File) {
     await this.validateFile(file);
     const fileName = `${Date.now()}-${file.originalname}`;
-    const minioEndpoint = this.configService.get<string>('MINIO_ENDPOINT');
-    console.log('minioEndpoint', minioEndpoint);
     try {
       await this.minioClient.putObject(
         this.bucketName,
@@ -61,26 +58,8 @@ export class MinioService {
         'GET',
         this.bucketName,
         fileName,
-        24 * 60 * 60,
+        604800,
       );
-      // const publicEndpoint = this.configService.get<string>(
-      //   'MINIO_PUBLIC_ENDPOINT',
-      // );
-
-      // console.log(url)
-
-      // if (publicEndpoint) {
-      //   const originalUrl = new URL(url);
-
-      //   const protocol = 'https';
-
-      //   const publicUrl = `${protocol}://${publicEndpoint}${originalUrl.pathname}${originalUrl.search}`;
-
-      //   console.log(`Transformed to public URL: ${publicUrl}`);
-      //   return publicUrl;
-      // }
-      
-
       return url;
     } catch (error) {
       throw new BadRequestException(

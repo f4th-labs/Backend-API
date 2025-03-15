@@ -15,7 +15,9 @@ export class NewsCategoriesService {
     private readonly newsCategoryRepository: Repository<NewsCategory>,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto): Promise<CreateCategoryDto> {
+  async create(
+    createCategoryDto: CreateCategoryDto,
+  ): Promise<CreateCategoryDto> {
     await this.isNewsCategoryExist(createCategoryDto.name);
 
     const newsCatagory = this.newsCategoryRepository.create(createCategoryDto);

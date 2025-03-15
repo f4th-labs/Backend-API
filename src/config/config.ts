@@ -21,7 +21,7 @@ class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   POSTGRES_PASSWORD: string;
-  
+
   @IsNotEmpty()
   @IsString()
   POSTGRES_DB: string;
@@ -61,10 +61,6 @@ class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   MINIO_USE_SSL: string;
-
-  @IsNotEmpty()
-  @IsString()
-  MINIO_PUBLIC_ENDPOINT: string;
 
   get isDevelopment(): boolean {
     return this.NODE_ENV === 'development';

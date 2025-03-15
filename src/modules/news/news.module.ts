@@ -8,7 +8,12 @@ import { UsersModule } from '../users/users.module';
 import { NewsCategoriesModule } from '../news-categories/news-categories.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([News]), MinioModule, UsersModule, NewsCategoriesModule],
+  imports: [
+    TypeOrmModule.forFeature([News]),
+    MinioModule,
+    UsersModule,
+    NewsCategoriesModule,
+  ],
   controllers: [NewsController],
   providers: [NewsService],
   exports: [NewsService],

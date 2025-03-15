@@ -17,14 +17,14 @@ export const AppDataSource = new DataSource({
   database: configService.get<string>('POSTGRES_DB'),
   synchronize: false,
   entities: [
-    isProduction 
-      ? path.join(__dirname, '..', '**', '*.entity.js') 
-      : 'src/**/*.entity.ts'
+    isProduction
+      ? path.join(__dirname, '..', '**', '*.entity.js')
+      : 'src/**/*.entity.ts',
   ],
   migrations: [
-    isProduction 
+    isProduction
       ? path.join(__dirname, '..', 'database', 'migrations', '*.js')
-      : 'src/database/migrations/*.ts'
+      : 'src/database/migrations/*.ts',
   ],
   migrationsRun: false,
   logging: true,

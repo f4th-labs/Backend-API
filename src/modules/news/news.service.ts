@@ -14,7 +14,6 @@ import { NewsCategoriesService } from '../news-categories/news-categories.servic
 
 @Injectable()
 export class NewsService {
-
   constructor(
     @InjectRepository(News)
     private readonly newsRepository: Repository<News>,

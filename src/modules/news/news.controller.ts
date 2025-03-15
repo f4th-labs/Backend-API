@@ -24,10 +24,11 @@ import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { Auth } from '@/common/decorators/auth.decorator';
-import { ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/common/guards';
 import { UpdateNewsDto } from './dto/update-news.dto';
 
+@ApiTags('news')
 @Controller('news')
 export class NewsController {
   constructor(
@@ -37,7 +38,8 @@ export class NewsController {
   ) {}
 
   @Post()
-  @Auth(UserRole.AUTHOR, UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.AUTHOR, UserRole.ADMIN)
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body() createNewsDto: CreateNewsDto,
@@ -68,14 +70,15 @@ export class NewsController {
     return this.newsService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('post/:id')
   async findOne(@Param('id') id: string) {
     return this.newsService.findOne(id);
   }
 
   @Put('post/:id')
-  @Auth(UserRole.AUTHOR, UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.AUTHOR, UserRole.ADMIN)
   @UseInterceptors(FileInterceptor('image'))
   async update(
     @Param('id') id: string,
@@ -83,16 +86,6 @@ export class NewsController {
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: User,
   ) {
-    const news = await this.newsService.findOne(id);
-    const isAdmin = user.role === UserRole.ADMIN;
-    const isAuthor = news.author && news.author.id === user.id;
-
-    if (!isAdmin && !isAuthor) {
-      throw new UnauthorizedException(
-        'You do not have permission to update this post',
-      );
-    }
-
     if (file) {
       await this.minioService.createBucketIfNotExists();
       const fileName = await this.minioService.uploadFile(file);
@@ -104,19 +97,9 @@ export class NewsController {
   }
 
   @Delete('post/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.AUTHOR, UserRole.ADMIN)
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
   async remove(@Param('id') id: string, @CurrentUser() user: User) {
-    const news = await this.newsService.findOne(id);
-    const isAdmin = user.role === 'admin';
-    const isAuthor = news.author && news.author.id === user.id;
-
-    if (!isAdmin && !isAuthor) {
-      throw new UnauthorizedException(
-        'You do not have permission to delete this post',
-      );
-    }
-
     return this.newsService.remove(id);
   }
 }

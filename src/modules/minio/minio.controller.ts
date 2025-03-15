@@ -11,7 +11,10 @@ import {
 import { MinioService } from './minio.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '@/common/guards';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('minio')
+@UseGuards(JwtAuthGuard)
 @Controller('minio')
 export class MinioController {
   constructor(private readonly minioService: MinioService) {}

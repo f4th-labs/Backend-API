@@ -3,11 +3,12 @@ import { UsersService } from './users.service';
 import { Get, Post, Put, Delete, Param, Body, Request } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { CurrentUser} from '@/common/decorators';
+import { CurrentUser } from '@/common/decorators';
 import { JwtAuthGuard, RolesGuard } from '@/common/guards';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -17,11 +18,13 @@ export class UsersController {
     return this.usersService.createUser(registerUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('author')
   async createAuthor(@Body() registerUserDto: RegisterUserDto): Promise<User> {
     return this.usersService.createAuthor(registerUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll() {
     return this.usersService.findAllUsers();
@@ -38,12 +41,16 @@ export class UsersController {
     return this.usersService.findUserByid(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
-  async updateUser(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
+  async updateUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard,RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
   async deleteUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.deleteUser(id);
