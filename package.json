@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "postbuild": "mkdir -p dist/database && cp -r src/database/migrations/*.js dist/database/migrations/",
+    "postbuild": "mkdir -p dist/database && cp -r src/database/run-migrations.js dist/database/ && cp -r src/typeorm.config.js dist/config/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "NODE_ENV=development nest start --watch",
