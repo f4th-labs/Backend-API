@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRole } from '@/shares/enums';
 
 @Injectable()
 export class UsersService {
@@ -49,7 +50,23 @@ export class UsersService {
     return this.userRepository.save(newUser);
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<UpdateUserDto> {
+  async createAuthor(registerUserDto: RegisterUserDto): Promise<User> {
+    await this.isUserExist(registerUserDto.email);
+    
+    const hashedPassword = await bcrypt.hash(registerUserDto.password, 10);
+
+    const newUser = this.userRepository.create({
+      ...registerUserDto,
+      role: UserRole.AUTHOR,
+      password: hashedPassword,
+    });
+    return this.userRepository.save(newUser);
+  }
+
+  async updateUser(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UpdateUserDto> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException();

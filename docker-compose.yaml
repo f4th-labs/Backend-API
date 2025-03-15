@@ -21,28 +21,14 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
       - ALLOWED_ORIGIN=${ALLOWED_ORIGIN}
+      - MINIO_USE_SSL=${MINIO_USE_SSL}
       - TZ=Asia/Bangkok
     ports:
       - '${PORT}:${PORT}'
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     restart: always
     networks:
       - news-portal
-    command: >
-      sh -c "
-        echo 'Waiting for database...' &&
-        until nc -z -v -w30 ${POSTGRES_HOST} ${POSTGRES_PORT}; do
-          echo 'Waiting for PostgreSQL...'
-          sleep 2
-        done &&
-        echo 'Database is up!' &&
-        echo 'Running migrations...' &&
-        node dist/database/run-migrations.js &&
-        echo 'Starting application...' &&
-        node dist/main.js
-      "
+
 networks:
   news-portal:
     driver: bridge
