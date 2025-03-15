@@ -6,9 +6,9 @@ async function runMigrations() {
   console.log('Database connection info:', {
     host: process.env.POSTGRES_HOST,
     port: process.env.POSTGRES_PORT,
-    database: process.env.POSTGRES_DB
+    database: process.env.POSTGRES_DB,
   });
-  
+
   try {
     const dataSource = new DataSource({
       type: 'postgres',
@@ -27,13 +27,15 @@ async function runMigrations() {
     console.log('Initializing data source...');
     await dataSource.initialize();
     console.log('Data source initialized, running migrations...');
-    
+
     const migrations = await dataSource.runMigrations({ transaction: 'all' });
-    console.log(`Migrations completed successfully: ${migrations.length} migrations applied`);
-    
+    console.log(
+      `Migrations completed successfully: ${migrations.length} migrations applied`,
+    );
+
     await dataSource.destroy();
     console.log('Database connection closed');
-    
+
     return true;
   } catch (error) {
     console.error('Migration error:', error);
