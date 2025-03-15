@@ -66,7 +66,9 @@ export class MinioService {
       const publicEndpoint = this.configService.get<string>(
         'MINIO_PUBLIC_ENDPOINT',
       );
-      
+
+      console.log(url)
+
       if (publicEndpoint) {
         const originalUrl = new URL(url);
 
@@ -77,6 +79,7 @@ export class MinioService {
         console.log(`Transformed to public URL: ${publicUrl}`);
         return publicUrl;
       }
+      
 
       return url;
     } catch (error) {
