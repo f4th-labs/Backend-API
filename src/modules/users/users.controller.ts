@@ -4,8 +4,8 @@ import { Get, Post, Put, Delete, Param, Body, Request } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { CurrentUser } from '@/common/decorators';
-import { JwtAuthGuard } from '@/common/guards';
+import { CurrentUser} from '@/common/decorators';
+import { JwtAuthGuard, RolesGuard } from '@/common/guards';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
@@ -38,6 +38,7 @@ export class UsersController {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
+  @UseGuards(JwtAuthGuard,RolesGuard)
   @Delete(':id')
   async deleteUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.deleteUser(id);
