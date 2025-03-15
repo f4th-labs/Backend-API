@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { News } from './entities/news.entity';
@@ -10,6 +14,7 @@ import { NewsCategoriesService } from '../news-categories/news-categories.servic
 
 @Injectable()
 export class NewsService {
+
   constructor(
     @InjectRepository(News)
     private readonly newsRepository: Repository<News>,
@@ -92,7 +97,6 @@ export class NewsService {
       delete updateNewsDto.categoryName;
     }
 
-    // Merge the new data with existing news
     const updatedNews = {
       ...news,
       ...updateNewsDto,
@@ -109,6 +113,23 @@ export class NewsService {
     if (!news) {
       throw new NotFoundException(`News not found`);
     }
+
+    const imageUrl = news.imageUrl;
+
+    if (imageUrl) {
+      const url = new URL(imageUrl);
+      const urlPath = url.pathname;
+
+      const encodedFileName = urlPath.split('/').pop() || '';
+      const fileName = decodeURIComponent(encodedFileName.split('?')[0]);
+
+      if (fileName) {
+        await this.minioService.deleteFile(fileName);
+      } else {
+        throw new InternalServerErrorException(`File name error`);
+      }
+    }
+
     await this.newsRepository.delete(id);
   }
 }

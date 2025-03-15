@@ -5,11 +5,14 @@ import {
   Param,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { MinioService } from './minio.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from '@/common/guards';
 
+@UseGuards(JwtAuthGuard)
 @Controller('minio')
 export class MinioController {
   constructor(private readonly minioService: MinioService) {}
@@ -23,13 +26,13 @@ export class MinioController {
   }
 
   @Get(':fileName')
-  async getBookCover(@Param('fileName') fileName: string) {
+  async getFile(@Param('fileName') fileName: string) {
     const fileUrl = await this.minioService.getFileUrl(fileName);
     return fileUrl;
   }
 
   @Delete(':fileName')
-  async deleteBookCover(@Param('fileName') fileName: string) {
+  async deleteFile(@Param('fileName') fileName: string) {
     await this.minioService.deleteFile(fileName);
     return fileName;
   }

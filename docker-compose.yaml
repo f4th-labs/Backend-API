@@ -1,28 +1,48 @@
 services:
-  db:
-    image: postgres:14
-    container_name: postgres
+  backend-api:
+    image: backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend-api
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=p@ssword
-      - POSTGRES_DB=mydb
-      - POSTGRES_PORT=5432
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_PORT=${MINIO_PORT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+      - ALLOWED_ORIGIN=${ALLOWED_ORIGIN}
+      - TZ=Asia/Bangkok
     ports:
-      - '5432:5432'
+      - '${PORT}:${PORT}'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-  minio:
-    image: bitnami/minio:latest
-    environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: supersecret
-    ports:
-      - '9000:9000'
-      - '9001:9001'
-    volumes:
-      - 'minio_data:/data'
-
-volumes:
-  postgres_data:
-  minio_data:
-    driver: local
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+    networks:
+      - news-portal
+    command: >
+      sh -c "
+        echo 'Waiting for database...' &&
+        until nc -z -v -w30 ${POSTGRES_HOST} ${POSTGRES_PORT}; do
+          echo 'Waiting for PostgreSQL...'
+          sleep 2
+        done &&
+        echo 'Database is up!' &&
+        echo 'Running migrations...' &&
+        node dist/database/run-migrations.js &&
+        echo 'Starting application...' &&
+        node dist/main.js
+      "
+networks:
+  news-portal:
+    driver: bridge

@@ -23,6 +23,7 @@ import { MinioController } from './modules/minio/minio.controller';
         database: configService.get<string>('POSTGRES_DB'),
         synchronize: configService.get<boolean>('isDevelopment'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        autoLoadEntities: true,
         logging: configService.get<boolean>('isDevelopment'),
       }),
       inject: [ConfigService],
