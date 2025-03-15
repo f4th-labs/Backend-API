@@ -14,10 +14,10 @@ export class MinioService {
   constructor(private readonly configService: ConfigService) {
     this.logger.log(
       'Initializing Minio service',
-      configService.get('MINIO_ENDPOINT'),
+      configService.get('MINIO_PUBLIC_ENDPOINT'),
     );
     this.minioClient = new Minio.Client({
-      endPoint: configService.get<string>('MINIO_ENDPOINT') || 'localhost',
+      endPoint: configService.get<string>('MINIO_PUBLIC_ENDPOINT') || 'localhost',
       port: configService.get<number>('MINIO_PORT'),
       useSSL: configService.get<string>('MINIO_USE_SSL') === 'true',
       accessKey: configService.get<string>('MINIO_ACCESS_KEY'),
@@ -63,22 +63,22 @@ export class MinioService {
         fileName,
         24 * 60 * 60,
       );
-      const publicEndpoint = this.configService.get<string>(
-        'MINIO_PUBLIC_ENDPOINT',
-      );
+      // const publicEndpoint = this.configService.get<string>(
+      //   'MINIO_PUBLIC_ENDPOINT',
+      // );
 
-      console.log(url)
+      // console.log(url)
 
-      if (publicEndpoint) {
-        const originalUrl = new URL(url);
+      // if (publicEndpoint) {
+      //   const originalUrl = new URL(url);
 
-        const protocol = 'https';
+      //   const protocol = 'https';
 
-        const publicUrl = `${protocol}://${publicEndpoint}${originalUrl.pathname}${originalUrl.search}`;
+      //   const publicUrl = `${protocol}://${publicEndpoint}${originalUrl.pathname}${originalUrl.search}`;
 
-        console.log(`Transformed to public URL: ${publicUrl}`);
-        return publicUrl;
-      }
+      //   console.log(`Transformed to public URL: ${publicUrl}`);
+      //   return publicUrl;
+      // }
       
 
       return url;
