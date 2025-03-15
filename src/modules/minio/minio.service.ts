@@ -9,7 +9,6 @@ export class MinioService {
   private bucketName: string;
   private readonly logger = new Logger(MinioService.name);
 
-
   constructor(private readonly configService: ConfigService) {
     this.minioClient = new Minio.Client({
       endPoint: configService.get<string>('MINIO_ENDPOINT') || 'localhost',
@@ -49,14 +48,16 @@ export class MinioService {
         fileName,
         24 * 60 * 60,
       );
-      
+
       if (url.startsWith('http:')) {
         return url.replace('http:', 'https:');
       }
       this.logger.log(`Generated URL: ${url}`);
       return url;
     } catch (error) {
-      throw new BadRequestException(`Failed to generate file URL: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to generate file URL: ${error.message}`,
+      );
     }
   }
 
