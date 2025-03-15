@@ -17,7 +17,7 @@ export class MinioService {
   constructor(private readonly configService: ConfigService) {
     this.minioClient = new Minio.Client({
       endPoint:
-        configService.get<string>('MINIO_PUBLIC_ENDPOINT') || 'localhost',
+        configService.get<string>('MINIO_ENDPOINT') || 'localhost',
       port: configService.get<number>('MINIO_PORT'),
       useSSL: configService.get<string>('MINIO_USE_SSL') === 'true',
       accessKey: configService.get<string>('MINIO_ACCESS_KEY'),
