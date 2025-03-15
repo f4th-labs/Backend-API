@@ -9,14 +9,15 @@ import {
 } from '@nestjs/common';
 import { NewsCategoriesService } from './news-categories.service';
 import { NewsCategory } from './entities/news-category.entity';
+import { CreateCategoryDto } from './dto/create-category.dto';
 
 @Controller('news-categories')
 export class NewsCategoriesController {
   constructor(private readonly newsCategoriesService: NewsCategoriesService) {}
 
   @Post()
-  async create(@Body() newsCategory: NewsCategory) {
-    return this.newsCategoriesService.create(newsCategory);
+  async create(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.newsCategoriesService.create(createCategoryDto);
   }
   
   @Get()
