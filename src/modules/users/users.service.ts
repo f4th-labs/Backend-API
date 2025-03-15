@@ -52,16 +52,15 @@ export class UsersService {
 
   async createAuthor(registerUserDto: RegisterUserDto): Promise<User> {
     await this.isUserExist(registerUserDto.email);
-
+    
     const hashedPassword = await bcrypt.hash(registerUserDto.password, 10);
 
     const newUser = this.userRepository.create({
       ...registerUserDto,
-      ,role: UserRole.AUTHOR,
+      role: UserRole.AUTHOR,
       password: hashedPassword,
     });
     return this.userRepository.save(newUser);
-
   }
 
   async updateUser(
