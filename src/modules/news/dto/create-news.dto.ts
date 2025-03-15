@@ -36,7 +36,7 @@ export class CreateNewsDto {
   })
   @IsNotEmpty()
   @IsString()
-  categoryName?: string;
+  categoryId: string;
 
   @ApiProperty({
     example: 'https://example.com/image.jpg',

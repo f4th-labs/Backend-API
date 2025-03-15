@@ -35,13 +35,9 @@ export class NewsService {
       imageUrl = await this.minioService.getFileUrl(fileName);
     }
 
-    const categoryName = createNewsDto.categoryName;
-    delete createNewsDto.categoryName;
-
-    if (!categoryName) {
-      throw new BadRequestException('Category name is required');
-    }
-    const category = await this.newsCategoriesService.findOne(categoryName);
+    const category = await this.newsCategoriesService.findOne(
+      createNewsDto.categoryId,
+    );
 
     const news = await this.newsRepository.create({
       ...createNewsDto,
@@ -96,15 +92,11 @@ export class NewsService {
       throw new NotFoundException(`New not found`);
     }
 
-    if (updateNewsDto.categoryName) {
-      const category = await this.newsCategoriesService.findOne(
-        updateNewsDto.categoryName,
-      );
+    const category = await this.newsCategoriesService.findOne(
+      updateNewsDto.categoryId,
+    );
 
-      news.category = category;
-
-      delete updateNewsDto.categoryName;
-    }
+    news.category = category;
 
     const updatedNews = {
       ...news,
