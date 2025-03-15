@@ -35,7 +35,7 @@ export class UpdateNewsDto {
     required: false,
   })
   @IsOptional()
-  categoryName?: any;
+  categoryName?: string;
 
   @ApiProperty({
     example: 'https://example.com/image.jpg',

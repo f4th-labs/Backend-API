@@ -26,9 +26,9 @@ export class News {
   @Column({ nullable: true })
   imageUrl: string;
 
-  @ManyToOne(() => NewsCategory, (category) => category.name)
-  @JoinColumn()
-  category: string;
+  @ManyToOne(() => NewsCategory, (category) => category.news)
+  @JoinColumn({ name: 'categoryId' })
+  category: NewsCategory;
 
   @ManyToOne(() => User, (user) => user.news)
   @JoinColumn()

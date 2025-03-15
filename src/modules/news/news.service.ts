@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -34,10 +35,19 @@ export class NewsService {
       imageUrl = await this.minioService.getFileUrl(fileName);
     }
 
+    const categoryName = createNewsDto.categoryName;
+    delete createNewsDto.categoryName;
+
+    if (!categoryName) {
+      throw new BadRequestException('Category name is required');
+    }
+    const category = await this.newsCategoriesService.findOne(categoryName);
+
     const news = await this.newsRepository.create({
       ...createNewsDto,
       author,
       imageUrl,
+      category,
     });
 
     return this.newsRepository.save(news);
@@ -91,7 +101,7 @@ export class NewsService {
         updateNewsDto.categoryName,
       );
 
-      news.category = category.id;
+      news.category = category;
 
       delete updateNewsDto.categoryName;
     }
