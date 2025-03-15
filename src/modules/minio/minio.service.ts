@@ -48,6 +48,7 @@ export class MinioService {
         fileName,
         24 * 60 * 60,
       );
+      this.logger.log(`Generated URL: ${url}`);
 
       if (url.startsWith('http:')) {
         return url.replace('http:', 'https:');
