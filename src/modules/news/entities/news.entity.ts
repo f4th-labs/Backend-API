@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -17,19 +18,24 @@ export class News {
   title: string;
 
   @Column()
+  description: string;
+
+  @Column()
   content: string;
+
+  @Column({ nullable: true })
+  imageUrl: string;
 
   @ManyToOne(() => NewsCategory, (category) => category.name)
   @JoinColumn()
   category: string;
 
-  @ManyToOne(() => User, (author) => author.news)
+  @ManyToOne(() => User, (user) => user.news)
   @JoinColumn()
-  author: string;
+  author: User;
 
-  @Column({
+  @CreateDateColumn({
     type: 'timestamp',
-    unique: true,
   })
   createdDate: Date;
 }

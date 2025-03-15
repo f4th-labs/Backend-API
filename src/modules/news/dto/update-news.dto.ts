@@ -1,7 +1,22 @@
+import { IsOptional, IsString } from 'class-validator';
+
 export class UpdateNewsDto {
+  @IsOptional()
+  @IsString()
   title?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
   content?: string;
-  category?: string;
-  author?: string;
-  createdDate?: Date;
+
+  @IsOptional()
+  categoryName?: any;
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }

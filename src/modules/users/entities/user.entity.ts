@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { UserRole } from '../../../shares/enums';
+import { UserRole } from '@/shares/enums';
 import { News } from '@/modules/news/entities/news.entity';
 
 @Entity({
@@ -26,10 +26,11 @@ export class User {
   password: string;
 
   @Column({
+    type: 'enum',
     enum: UserRole,
-    nullable: true,
+    default: UserRole.USER,
   })
-  role: string;
+  role: UserRole;
 
   @OneToMany(() => News, (news) => news.author, {
     cascade: true,

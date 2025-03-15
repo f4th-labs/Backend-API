@@ -1,28 +1,28 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NewsCategoriesModule, NewsModule, UsersModule } from './modules';
-import { configuration } from './config/config';
+import { validate } from './config/config';
 import { AuthModule } from './modules/auth/auth.module';
-
+import { MinioModule } from './modules/minio/minio.module';
+import { MinioController } from './modules/minio/minio.controller';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '/.env',
-      load: [configuration],
+      validate,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: configService.get<string>('database.host'),
-        port: configService.get<number>('database.port'),
-        username: configService.get<string>('database.username'),
-        password: configService.get<string>('database.password'),
-        database: configService.get<string>('database.db'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        host: configService.get<string>('POSTGRES_HOST'),
+        port: configService.get<number>('POSTGRES_PORT'),
+        username: configService.get<string>('POSTGRES_USER'),
+        password: configService.get<string>('POSTGRES_PASSWORD'),
+        database: configService.get<string>('POSTGRES_DB'),
         synchronize: configService.get<boolean>('isDevelopment'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         logging: configService.get<boolean>('isDevelopment'),
       }),
       inject: [ConfigService],
@@ -31,6 +31,8 @@ import { AuthModule } from './modules/auth/auth.module';
     NewsModule,
     NewsCategoriesModule,
     UsersModule,
+    MinioModule,
   ],
+  controllers: [MinioController],
 })
 export class AppModule {}

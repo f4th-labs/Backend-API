@@ -1,9 +1,12 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Get, Post, Put, Delete, Param, Body, Request } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { CurrentUser } from '@/common/decorators';
+import { JwtAuthGuard } from '@/common/guards';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -14,30 +17,29 @@ export class UsersController {
     return this.usersService.createUser(registerUserDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get('profile')
-  getProfile(@Request() req) {
-    const user = this.usersService.findUserbyEmail(req.user.email);
-    return user;
-  }
-
   @Get()
   async findAll() {
     return this.usersService.findAllUsers();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMe(@CurrentUser() user) {
+    return this.usersService.findUserbyEmail(user.email);
+  }
+
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.findUserByid(id);
   }
 
   @Put(':id')
-  async updateUser(@Param('id') id: string, @Body() user: User) {
-    return this.usersService.updateUser(id, user);
+  async updateUser(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: string) {
+  async deleteUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.deleteUser(id);
   }
 }
