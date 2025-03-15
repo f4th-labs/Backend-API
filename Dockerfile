@@ -20,11 +20,7 @@ COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modul
 
 COPY --chown=node:node . .
 
-RUN mkdir -p dist/database
-
 RUN npm run build
-
-COPY --chown=node:node src/database/run-migrations.js dist/database/
 
 ENV NODE_ENV=production
 
