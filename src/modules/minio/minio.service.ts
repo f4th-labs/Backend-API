@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Minio from 'minio';
 import * as fileType from 'file-type';
+import { log } from 'console';
 
 @Injectable()
 export class MinioService {
@@ -11,6 +12,7 @@ export class MinioService {
   private readonly configServicer: ConfigService;
 
   constructor(private readonly configService: ConfigService) {
+    this.logger.log('Initializing Minio service', configService.get('MINIO_ENDPOINT'));
     this.minioClient = new Minio.Client({
       endPoint: configService.get<string>('MINIO_ENDPOINT') || 'localhost',
       port: configService.get<number>('MINIO_PORT'),
@@ -34,13 +36,19 @@ export class MinioService {
     const fileName = `${Date.now()}-${file.originalname}`;
     const minioEndpoint = this.configService.get<string>('MINIO_ENDPOINT');
     console.log('minioEndpoint', minioEndpoint);
-    await this.minioClient.putObject(
-      this.bucketName,
-      fileName,
-      file.buffer,
-      file.size,
-    );
-    return fileName;
+    try {
+      await this.minioClient.putObject(
+        this.bucketName,
+        fileName,
+        file.buffer,
+        file.size,
+      );
+      return fileName;
+    } catch (error) {
+      throw new error(
+        `Failed to upload file to Minio: ${error.message}`,
+      );
+    }
   }
 
   async getFileUrl(fileName: string) {
