@@ -8,6 +8,7 @@ export class MinioService {
   private minioClient: Minio.Client;
   private bucketName: string;
   private readonly logger = new Logger(MinioService.name);
+  private readonly configServicer: ConfigService;
 
   constructor(private readonly configService: ConfigService) {
     this.minioClient = new Minio.Client({
@@ -31,6 +32,8 @@ export class MinioService {
   async uploadFile(file: Express.Multer.File) {
     await this.validateFile(file);
     const fileName = `${Date.now()}-${file.originalname}`;
+    const minioEndpoint = this.configService.get<string>('MINIO_ENDPOINT');
+    console.log('minioEndpoint', minioEndpoint);
     await this.minioClient.putObject(
       this.bucketName,
       fileName,
