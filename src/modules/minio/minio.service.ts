@@ -40,11 +40,23 @@ export class MinioService {
   }
 
   async getFileUrl(fileName: string) {
-    return await this.minioClient.presignedUrl(
-      'GET',
-      this.bucketName,
-      fileName,
-    );
+    try {
+      const url = await this.minioClient.presignedUrl(
+        'GET',
+        this.bucketName,
+        fileName,
+        24 * 60 * 60,
+      );
+      
+      if (url.startsWith('http:')) {
+        return url.replace('http:', 'https:');
+      }
+      
+      return url;
+    } catch (error) {
+      this.logger.error(`Failed to generate presigned URL: ${error.message}`);
+      throw new BadRequestException(`Failed to generate file URL: ${error.message}`);
+    }
   }
 
   async deleteFile(fileName: string) {
