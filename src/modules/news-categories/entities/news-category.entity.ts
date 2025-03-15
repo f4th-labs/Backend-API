@@ -1,4 +1,4 @@
-import { News } from '@/modules/news/entities/news.entity';
+import { News } from '../../../modules/news/entities/news.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

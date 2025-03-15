@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { UserRole } from '@/shares/enums';
-import { News } from '@/modules/news/entities/news.entity';
+import { UserRole } from '../../../shares/enums/user-role.enum';
+import { News } from '../../news/entities/news.entity';
 
 @Entity({
   name: 'users',

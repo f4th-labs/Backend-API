@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "postbuild": "mkdir -p dist/database && cp -r src/database/run-migrations.js dist/database/",
+    "postbuild": "mkdir -p dist/database && cp -r src/database/migrations/*.js dist/database/migrations/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "NODE_ENV=development nest start --watch",
@@ -20,10 +20,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:run": "npm run typeorm -- migration:run -d ./src/config/typeorm.config.ts",
-    "migration:generate": "npm run typeorm -- migration:generate -d ./src/config/typeorm.config.ts",
+    "migration:run": "npm run typeorm -- migration:run -d ./src/config/typeorm.config.js",
+    "migration:generate": "npm run typeorm -- migration:generate -d ./src/config/typeorm.config.js",
     "migration:create": "npm run typeorm -- migration:create",
-    "migration:revert": "npm run typeorm -- migration:revert -d ./src/config/typeorm.config.ts"
+    "migration:revert": "npm run typeorm -- migration:revert -d ./src/config/typeorm.config.js"
   },
   "dependencies": {
     "@nestjs/class-transformer": "^0.4.0",
