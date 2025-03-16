@@ -35,6 +35,8 @@ export class NewsService {
       imageUrl = await this.minioService.getFileUrl(fileName);
     }
 
+    console.log('createNewsDto', createNewsDto);
+
     const category = await this.newsCategoriesService.findOne(
       createNewsDto.categoryId,
     );
