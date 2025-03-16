@@ -38,6 +38,7 @@ export class NewsService {
     const category = await this.newsCategoriesService.findOne(
       createNewsDto.categoryId,
     );
+    console.log('category', category);
 
     const news = await this.newsRepository.create({
       ...createNewsDto,
@@ -46,6 +47,8 @@ export class NewsService {
     });
 
     news.category = category;
+
+    console.log('news', news);
 
     return this.newsRepository.save(news);
   }
