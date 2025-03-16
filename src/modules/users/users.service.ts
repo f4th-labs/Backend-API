@@ -63,6 +63,19 @@ export class UsersService {
     return this.userRepository.save(newUser);
   }
 
+  async createAdmin(registerUserDto: RegisterUserDto): Promise<User> {
+    await this.isUserExist(registerUserDto.email);
+
+    const hashedPassword = await bcrypt.hash(registerUserDto.password, 10);
+
+    const newUser = this.userRepository.create({
+      ...registerUserDto,
+      role: UserRole.ADMIN,
+      password: hashedPassword,
+    });
+    return this.userRepository.save(newUser);
+  }
+
   async updateUser(
     id: string,
     updateUserDto: UpdateUserDto,
