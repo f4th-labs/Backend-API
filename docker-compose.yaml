@@ -1,28 +1,34 @@
 services:
-  db:
-    image: postgres:14
-    container_name: postgres
-    env_file:
-      - ./.env
+  backend-api:
+    image: backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend-api
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_PORT=${MINIO_PORT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+      - ALLOWED_ORIGIN=${ALLOWED_ORIGIN}
+      - MINIO_USE_SSL=${MINIO_USE_SSL}
+      - TZ=Asia/Bangkok
     ports:
-      - '5432:5432'
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - '${PORT}:${PORT}'
+    restart: always
+    networks:
+      - news-portal
 
-  # app:
-  #   build: .
-  #   container_name: backend-api
-  #   environment:
-  #     NODE_ENV: development
-  #     POSTGRES_HOST: db
-  #     POSTGRES_PORT: 5432
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: p@ssword
-  #     POSTGRES_DB: mydb
-  #   ports:
-  #     - '3000:3000'
-  #   depends_on:
-  #     - db
-
-volumes:
-  postgres_data:
+networks:
+  news-portal:
+    driver: bridge

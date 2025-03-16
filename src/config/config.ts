@@ -1,12 +1,83 @@
-export const configuration = () => ({
-  NODE_ENV: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT || '5001', 10),
-  database: {
-    host: process.env.POSTGRES_HOST || 'localhost',
-    port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
-    username: process.env.POSTGRES_USER || 'postgres',
-    password: process.env.POSTGRES_PASSWORD || 'p@assword',
-    db: process.env.POSTGRES_DB || 'mydb',
-  },
-  isDevelopment: process.env.NODE_ENV !== 'production',
-});
+import { plainToInstance } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsString, validateSync } from 'class-validator';
+
+class EnvironmentVariables {
+  @IsNotEmpty()
+  @IsString()
+  NODE_ENV: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  PORT: number;
+
+  @IsNotEmpty()
+  @IsString()
+  POSTGRES_HOST: string;
+
+  @IsNotEmpty()
+  @IsString()
+  POSTGRES_USER: string;
+
+  @IsNotEmpty()
+  @IsString()
+  POSTGRES_PASSWORD: string;
+
+  @IsNotEmpty()
+  @IsString()
+  POSTGRES_DB: string;
+
+  @IsNotEmpty()
+  @IsString()
+  JWT_SECRET: string;
+
+  @IsNotEmpty()
+  @IsString()
+  JWT_EXPIRES_IN: string;
+
+  @IsNotEmpty()
+  @IsString()
+  MINIO_ACCESS_KEY: string;
+
+  @IsNotEmpty()
+  @IsString()
+  MINIO_SECRET_KEY: string;
+
+  @IsNotEmpty()
+  @IsString()
+  MINIO_ENDPOINT: string;
+
+  @IsNotEmpty()
+  @IsString()
+  MINIO_BUCKET_NAME: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  MINIO_PORT: number;
+
+  @IsNotEmpty()
+  @IsString()
+  ALLOWED_ORIGIN: string;
+
+  @IsNotEmpty()
+  @IsString()
+  MINIO_USE_SSL: string;
+
+  get isDevelopment(): boolean {
+    return this.NODE_ENV === 'development';
+  }
+}
+
+export function validate(config: Record<string, unknown>) {
+  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+    enableImplicitConversion: true,
+  });
+  const errors = validateSync(validatedConfig, {
+    skipMissingProperties: false,
+  });
+
+  if (errors.length > 0) {
+    throw new Error(errors.toString());
+  }
+
+  return validatedConfig;
+}

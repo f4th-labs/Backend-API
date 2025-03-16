@@ -1,12 +1,13 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { NewsCategory } from '@/modules/news-categories/entities/news-category.entity';
-import { User } from '@/modules/users/entities/user.entity';
+import { NewsCategory } from '../../../modules/news-categories/entities/news-category.entity';
+import { User } from '../../../modules/users/entities/user.entity';
 
 @Entity({ name: 'news' })
 export class News {
@@ -17,19 +18,24 @@ export class News {
   title: string;
 
   @Column()
+  description: string;
+
+  @Column()
   content: string;
 
-  @ManyToOne(() => NewsCategory, (category) => category.name)
-  @JoinColumn()
-  category: string;
+  @Column({ nullable: true })
+  imageUrl: string;
 
-  @ManyToOne(() => User, (author) => author.news)
-  @JoinColumn()
-  author: string;
+  @ManyToOne(() => NewsCategory, (category) => category.news)
+  @JoinColumn({ name: 'categoryId' })
+  category: NewsCategory;
 
-  @Column({
+  @ManyToOne(() => User, (user) => user.news)
+  @JoinColumn()
+  author: User;
+
+  @CreateDateColumn({
     type: 'timestamp',
-    unique: true,
   })
   createdDate: Date;
 }

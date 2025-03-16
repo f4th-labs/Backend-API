@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { NewsCategory } from './entities/news-category.entity';
+import { CreateCategoryDto } from './dto/create-category.dto';
 
 @Injectable()
 export class NewsCategoriesService {
@@ -14,11 +15,13 @@ export class NewsCategoriesService {
     private readonly newsCategoryRepository: Repository<NewsCategory>,
   ) {}
 
-  async create(newsCategory: NewsCategory): Promise<NewsCategory> {
-    await this.isNewsCategoryExist(newsCategory.name);
+  async create(
+    createCategoryDto: CreateCategoryDto,
+  ): Promise<CreateCategoryDto> {
+    await this.isNewsCategoryExist(createCategoryDto.name);
 
-    const newsCatagory = this.newsCategoryRepository.create(newsCategory);
-    return this.newsCategoryRepository.save(newsCatagory);
+    const newsCatagory = this.newsCategoryRepository.create(createCategoryDto);
+    return this.newsCategoryRepository.save(createCategoryDto);
   }
   0;
 
