@@ -1,6 +1,6 @@
 import { Controller, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Get, Post, Put, Delete, Param, Body, Request } from '@nestjs/common';
+import { Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { CurrentUser } from '@/common/decorators';
@@ -18,13 +18,16 @@ export class UsersController {
     return this.usersService.createUser(registerUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('author')
   async createAuthor(@Body() registerUserDto: RegisterUserDto): Promise<User> {
     return this.usersService.createAuthor(registerUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Post('admin')
+  async createAdmin(@Body() registerUserDto: RegisterUserDto): Promise<User> {
+    return this.usersService.createAdmin(registerUserDto);
+  }
+
   @Get()
   async findAll() {
     return this.usersService.findAllUsers();

@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { Response } from 'express';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginResponseDto } from './dto/responses/login-response.dto';
 import { LogoutResponseDto } from './dto/responses/logout-response.dto';
 
@@ -20,6 +20,18 @@ export class AuthController {
   @ApiResponse({
     status: 401,
     description: 'Unauthorized - Invalid credentials',
+  })
+  @ApiBody({ 
+    description: 'User credentials',
+    examples: {
+      example1: {
+        value: {
+          email: 'user@example.com',
+          password: 'password123'
+        },
+        summary: 'User login credentials'
+      }
+    }
   })
   @UseGuards(LocalAuthGuard)
   @Post('login')
