@@ -43,8 +43,9 @@ export class NewsService {
       ...createNewsDto,
       author,
       imageUrl,
-      category,
     });
+
+    news.category = category;
 
     return this.newsRepository.save(news);
   }
